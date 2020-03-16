@@ -1,0 +1,2 @@
+rootProject.name='OjScaffolding'
+include ':scaffolding'
