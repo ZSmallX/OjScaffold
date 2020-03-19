@@ -16,7 +16,7 @@ import javafx.util.Pair;
  * {@link #newTreeFromArrays(Integer...)}
  * {@link #newListNodeFromArrays(Integer...)}
  * {@link #toIntMatrix(String)}
- * {@link #toIntListList(String)}
+ * {@link #toListList(String, Creator)}
  * <p>
  * Handles outputs:
  * {@link #convertTreeAsArrays(TreeNode)}
@@ -31,6 +31,24 @@ import javafx.util.Pair;
  * @since 2020/03/15
  */
 public class OjUtils {
+    public static final Creator<Integer> INTEGER_CREATOR = new Creator<Integer>() {
+        @Override
+        public Integer create(String text) {
+            try {
+                return Integer.valueOf(text);
+            } catch (NumberFormatException e) {
+                return Integer.MIN_VALUE;
+            }
+        }
+    };
+
+    public static final Creator<String> STRING_CREATOR = new Creator<String>() {
+        @Override
+        public String create(String text) {
+            return text;
+        }
+    };
+
     public static String arraysToString(Integer[] integers) {
         StringBuilder builder = new StringBuilder();
         for (Integer integer : integers) {
@@ -172,14 +190,20 @@ public class OjUtils {
         // TODO: 2020/3/15 check text format.
         String[] pieces = filted.split("],");
         // TODO: 2020/3/15 check is a valid matrix.
+        // FIXME: 2020/3/20 invalid length handle.
         int[][] result = new int[pieces.length][pieces[0].split(",").length];
         for (int i = 0; i < pieces.length; i++) {
             String[] integers = pieces[i].split(",");
             for (int j = 0; j < integers.length; j++) {
-                result[i][j] = Integer.parseInt(
-                        integers[j].replaceAll("\\[", "")
-                                .replaceAll("]", "")
-                                .trim());
+                // FIXME: 2020/3/20 empty String.
+                try {
+                    result[i][j] = Integer.parseInt(
+                            integers[j].replaceAll("\\[", "")
+                                    .replaceAll("]", "")
+                                    .trim());
+                } catch (NumberFormatException e) {
+                    // TODO: 2020/3/20 need a nicer handle!
+                }
             }
         }
         return result;
@@ -201,20 +225,35 @@ public class OjUtils {
      * <p>
      * [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]]
      *
-     * @param text input
-     * @return result in List<List<Integer>>, or exception if not excepted format.
+     * @param text    input.
+     * @param creator target type creator.
+     * @param <T>     type of list content.
+     * @return result in List<List<T>>, or exception if not excepted format.
      */
-    public static List<List<Integer>> toIntListList(String text) {
-        int[][] matrix = toIntMatrix(text);
-        List<List<Integer>> result = new ArrayList<>();
-        for (int i = 0; i < matrix.length; i++) {
-            List<Integer> list = new ArrayList<>();
-            for (int j = 0; j < matrix[i].length; j++) {
-                list.add(matrix[i][j]);
+    public static <T> List<List<T>> toListList(String text, Creator<T> creator) {
+        String noSeparator = text.replaceAll("\n", "").trim();
+        // TODO: 2020/3/20 maybe check text format.
+        String[] pieces = noSeparator.split("],");
+        // TODO: 2020/3/20 maybe generate a method of split.
+        List<List<T>> lists = new ArrayList<>();
+        for (String piece : pieces) {
+            String[] elements = piece.split(",");
+            List<T> list = new ArrayList<>();
+            for (String element : elements) {
+                String content = element.replaceAll("\\[", "")
+                        .replaceAll("]", "")
+                        .trim();
+                if (content != null && content.length() != 0) {
+                    list.add(creator.create(content));
+                }
             }
-            result.add(list);
+            lists.add(list);
         }
-        return result;
+        return lists;
+    }
+
+    public interface Creator<T> {
+        T create(String text);
     }
 
     public static class ListListMatcher extends BaseMatcher {
@@ -233,7 +272,6 @@ public class OjUtils {
 
         @Override
         public void describeTo(Description description) {
-
         }
     }
 }
