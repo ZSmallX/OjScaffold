@@ -1,6 +1,6 @@
 # OjScaffolding 
 
-![build](https://github.com/ZSmallX/OjScaffolding/workflows/build/badge.svg)
+![build](https://github.com/ZSmallX/OjScaffolding/workflows/build/badge.svg?branch=master)
 
 Hello,OjScaffolding.
 
