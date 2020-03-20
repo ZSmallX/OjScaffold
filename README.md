@@ -1,6 +1,6 @@
 # OjScaffolding 
 
-![](https://github.com/ZSmallX/OjScaffolding/workflows/.github/workflows/gradle.yml/badge.svg)
+![build](https://github.com/ZSmallX/OjScaffolding/workflows/build/badge.svg)
 
 Hello,OjScaffolding.
 
