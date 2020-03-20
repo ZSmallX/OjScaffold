@@ -1,4 +1,7 @@
-# OjScaffolding
+# OjScaffolding 
+
+![](https://github.com/ZSmallX/OjScaffolding/workflows/.github/workflows/gradle.yml/badge.svg)
+
 Hello,OjScaffolding.
 
 Convenient utility box for quick Online Judge(OJ) input/output handle & assert.
