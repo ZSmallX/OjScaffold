@@ -1,12 +1,14 @@
-package dio.oj.scaffolding;
+package oj.scaffold;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.regex.Pattern;
 
 import javafx.util.Pair;
 
@@ -37,6 +39,7 @@ public class OjUtils {
             try {
                 return Integer.valueOf(text);
             } catch (NumberFormatException e) {
+                // TODO: 2020/3/21 maybe a obvious exception here.
                 return Integer.MIN_VALUE;
             }
         }
@@ -45,9 +48,17 @@ public class OjUtils {
     public static final Creator<String> STRING_CREATOR = new Creator<String>() {
         @Override
         public String create(String text) {
-            return text;
+            return removeQuotesIfNeeded(text);
         }
     };
+
+    private static String removeQuotesIfNeeded(String text) {
+        if (Pattern.matches("\".*\"", text)) {
+            // length >= 2 now.
+            return text.substring(1, text.length() - 1);
+        }
+        return text;
+    }
 
     public static String arraysToString(Integer[] integers) {
         StringBuilder builder = new StringBuilder();
@@ -186,25 +197,41 @@ public class OjUtils {
      * @return result in int[][], or exception if not excepted format.
      */
     public static int[][] toIntMatrix(String text) {
-        String filted = text.replaceAll("\n", "").trim();
-        // TODO: 2020/3/15 check text format.
-        String[] pieces = filted.split("],");
+        if (text == null || text.length() == 0) {
+            return null;
+        }
+        String cleanS = text.replaceAll("\n", "").replace(" ", "");
+        if (!LeetCode.check1dFormat(cleanS)) {
+            return new int[0][0];
+        }
+        if (!LeetCode.check2dFormat(cleanS)) {
+            return new int[1][0];
+        }
+        String[] pieces = cleanS.split("],");
         // TODO: 2020/3/15 check is a valid matrix.
         // FIXME: 2020/3/20 invalid length handle.
-        int[][] result = new int[pieces.length][pieces[0].split(",").length];
+        int[][] result = new int[pieces.length][];
         for (int i = 0; i < pieces.length; i++) {
-            String[] integers = pieces[i].split(",");
+            String raw = pieces[i].replaceAll("\\[", "")
+                    .replaceAll("]", "")
+                    .trim();
+            if (raw.length() == 0) {
+                result[i] = new int[0];
+                continue;
+            }
+            String[] integers = raw.split(",");
+            int[] ints = new int[integers.length];
             for (int j = 0; j < integers.length; j++) {
                 // FIXME: 2020/3/20 empty String.
                 try {
-                    result[i][j] = Integer.parseInt(
-                            integers[j].replaceAll("\\[", "")
-                                    .replaceAll("]", "")
-                                    .trim());
+                    ints[j] = Integer.parseInt(
+                            integers[j]);
                 } catch (NumberFormatException e) {
                     // TODO: 2020/3/20 need a nicer handle!
+                    ints[j] = Integer.MIN_VALUE;
                 }
             }
+            result[i] = ints;
         }
         return result;
     }
@@ -231,12 +258,22 @@ public class OjUtils {
      * @return result in List<List<T>>, or exception if not excepted format.
      */
     public static <T> List<List<T>> toListList(String text, Creator<T> creator) {
-        String noSeparator = text.replaceAll("\n", "").trim();
-        // TODO: 2020/3/20 maybe check text format.
-        String[] pieces = noSeparator.split("],");
-        // TODO: 2020/3/20 maybe generate a method of split.
+        if (text == null || text.length() == 0) {
+            return null;
+        }
+        String cleanS = text.replaceAll("\n", "").replace(" ", "");
+        if (!LeetCode.check1dFormat(cleanS)) {
+            return Collections.emptyList();
+        }
         List<List<T>> lists = new ArrayList<>();
+        if (!LeetCode.check2dFormat(cleanS)) {
+            lists.add(Collections.<T>emptyList());
+            return lists;
+        }
+        String[] pieces = cleanS.split("],");
+        // TODO: 2020/3/20 maybe generate a method of split.
         for (String piece : pieces) {
+            // TODO: 2020/3/21 maybe check splits' format.
             String[] elements = piece.split(",");
             List<T> list = new ArrayList<>();
             for (String element : elements) {
@@ -256,7 +293,7 @@ public class OjUtils {
         T create(String text);
     }
 
-    public static class ListListMatcher extends BaseMatcher {
+    public static final class ListListMatcher extends BaseMatcher {
         private final List<List<Integer>> target;
 
         public ListListMatcher(List<List<Integer>> target) {
@@ -272,6 +309,16 @@ public class OjUtils {
 
         @Override
         public void describeTo(Description description) {
+        }
+    }
+
+    static final class LeetCode {
+        static boolean check1dFormat(String s) {
+            return Pattern.matches("\\[.+]", s);
+        }
+
+        static boolean check2dFormat(String s) {
+            return Pattern.matches("\\[\\[.+]]", s);
         }
     }
 }
