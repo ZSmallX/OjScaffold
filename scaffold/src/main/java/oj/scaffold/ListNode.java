@@ -1,4 +1,4 @@
-package dio.oj.scaffolding;
+package oj.scaffold;
 
 public class ListNode {
     public ListNode next;
