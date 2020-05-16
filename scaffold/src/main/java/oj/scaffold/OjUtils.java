@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.regex.Pattern;
 
-import javafx.util.Pair;
-
 /**
  * Utils for OJ(Online Judge).
  * Handles inputs:
