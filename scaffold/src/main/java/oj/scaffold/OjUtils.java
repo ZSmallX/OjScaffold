@@ -195,6 +195,7 @@ public class OjUtils {
      *
      * @param text input
      * @return result in int[][], or exception if not excepted format.
+     * @throws IllegalArgumentException if there is any elements in the input can not be parsed to int.
      */
     public static int[][] toIntMatrix(String text) {
         if (text == null || text.length() == 0) {
@@ -227,11 +228,62 @@ public class OjUtils {
                     ints[j] = Integer.parseInt(
                             integers[j]);
                 } catch (NumberFormatException e) {
-                    // TODO: 2020/3/20 need a nicer handle!
-                    ints[j] = Integer.MIN_VALUE;
+                    throw new IllegalArgumentException("Bad input can not be parsed to int, value is : " + integers[j]);
                 }
             }
             result[i] = ints;
+        }
+        return result;
+    }
+
+    /**
+     * Handles input like this:
+     * [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+     *
+     * TODO generic with {@link #toIntMatrix(String)}.
+     *
+     * @param text input
+     * @return result in char[][], or exception if not excepted format.
+     * @throws IllegalArgumentException if there is any elements in the input can not be parsed to int.
+     */
+    public static char[][] toCharMatrix(String text) {
+        if (text == null || text.length() == 0) {
+            return null;
+        }
+        String oneLine = text.replaceAll("\n", "").replace(" ", "");
+        if (!LeetCode.check1dFormat(oneLine)) {
+            return new char[0][0];
+        }
+        if (!LeetCode.check2dFormat(oneLine)) {
+            return new char[1][0];
+        }
+
+        String[] pieces = oneLine.split("],");
+        // TODO: 2020/3/15 check is a valid matrix.
+        // FIXME: 2020/3/20 invalid length handle.
+        char[][] result = new char[pieces.length][];
+        for (int i = 0; i < pieces.length; i++) {
+            String raw = pieces[i].replaceAll("\\[", "")
+                    .replaceAll("]", "")
+                    .trim();
+            if (raw.length() == 0) {
+                result[i] = new char[0];
+                continue;
+            }
+            String[] charStr = raw.split(",");
+            char[] chars = new char[charStr.length];
+            for (int j = 0; j < charStr.length; j++) {
+                // FIXME: 2020/3/20 empty String.
+                if (charStr[j].length() != 3) { // eg. "1"
+                    throw new IllegalArgumentException("char size not three!");
+                }
+                try {
+                    chars[j] = charStr[j].charAt(1); // eg. "1"
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Bad input can not be parsed to int, value is : " + charStr[j]);
+                }
+            }
+            result[i] = chars;
         }
         return result;
     }

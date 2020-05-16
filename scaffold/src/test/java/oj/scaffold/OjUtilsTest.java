@@ -25,6 +25,28 @@ public class OjUtilsTest {
     }
 
     @Test
+    public void testToCharMatrix_2d() {
+        Assert.assertArrayEquals(new char[][]{{'1', '0', '1', '0', '0'},
+                {'1', '0', '1', '1', '1'},
+                {'1', '1', '1', '1', '1'},
+                {'1', '0', '0', '1', '0'},}, OjUtils.toCharMatrix(
+                "[[\"1\",\"0\",\"1\",\"0\",\"0\"]," +
+                        "[\"1\",\"0\",\"1\",\"1\",\"1\"]," +
+                        "[\"1\",\"1\",\"1\",\"1\",\"1\"]," +
+                        "[\"1\",\"0\",\"0\",\"1\",\"0\"]]"));
+    }
+
+    @Test
+    public void testToCharMatrix_singleElement2d() {
+        Assert.assertArrayEquals(new char[][]{{'1'}}, OjUtils.toCharMatrix("[[\"1\"]]"));
+    }
+
+    @Test
+    public void testToCharMatrix_empty2d() {
+        Assert.assertArrayEquals(new char[][]{{}}, OjUtils.toCharMatrix("[[]]"));
+    }
+
+    @Test
     public void testToListList_emptyList() {
         List<List<Integer>> lists = new ArrayList<>();
         List<Integer> list = new ArrayList<>();
